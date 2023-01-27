@@ -40,13 +40,9 @@ public class Client extends Thread
             s = new Socket("localhost", this.port);
             output_stream = new ObjectOutputStream(s.getOutputStream());
         }
-        catch (IOException e)
+        catch (Exception e)
         {
-            throw new RuntimeException(e);
-        }
-        catch (InterruptedException e)
-        {
-            throw new RuntimeException(e);
+            //e.printStackTrace();
         }
     }
 
@@ -54,6 +50,7 @@ public class Client extends Thread
     {
         try
         {
+            this.output_stream.close();
             this.s.close();
         }
         catch (IOException e)

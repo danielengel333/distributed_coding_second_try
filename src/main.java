@@ -24,6 +24,7 @@ public class main {
                 if(line.contains("update")){
                     String[] data = line.split(" ");
                     m.update_edge(Integer.parseInt(data[1]), Integer.parseInt(data[2]), Double.parseDouble(data[3]));
+                    System.out.println("update");
                 }
             }
             m.terminate();

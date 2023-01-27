@@ -19,12 +19,19 @@ public class Server extends Thread
 
     public Message read_input() throws IOException, ClassNotFoundException
     {
-        if (this.input_stream == null)
+        try
+        {
+            if (this.input_stream == null)
+            {
+                return null;
+            }
+            Message input = (Message)input_stream.readObject();;
+            return input;
+        }
+        catch (Exception e)
         {
             return null;
         }
-        Message input = (Message)input_stream.readObject();;
-        return input;
     }
 
     @Override
@@ -38,7 +45,7 @@ public class Server extends Thread
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -46,6 +53,7 @@ public class Server extends Thread
     {
         try
         {
+            this.input_stream.close();
             this.s.close();
             this.ss.close();
         }

@@ -81,21 +81,24 @@ public class ExManager {
             {
                 this.nodes[i].start();
             }
-            while (true)
+            /*while (true)
             {
-                double sum = 0;
+                int sum = 0;
                 for (int i = 0; i < this.num_of_nodes; i++)
                 {
                     sum += this.nodes[i].getNum_visited();
                 }
-                double av = sum / this.num_of_nodes;
-                System.out.println(av);
-                if(av == this.num_of_nodes)
+                System.out.println(sum / this.num_of_nodes);
+                if(sum == this.num_of_nodes * this.num_of_nodes)
                     break;
-            }
+            }*/
             for (int i = 0; i < this.num_of_nodes; i++)
             {
                 this.nodes[i].join();
+            }
+            for (int i = 0; i < this.num_of_nodes; i++)
+            {
+                this.nodes[i].terminate();
             }
         }
         catch (Exception e)

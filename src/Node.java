@@ -6,7 +6,6 @@ import java.util.concurrent.Semaphore;
 
 public class Node extends Thread
 {
-    private boolean first_time;
     private int id;
     private int[] neighbors_id;
     private double[] edges;
@@ -15,17 +14,7 @@ public class Node extends Thread
     private int num_of_nodes;
     private int num_of_neighbors;
     private double[][] weight_matrix;
-    //private Pair<Integer, Object> linkedState;
-    //private int[] visited;
-    //private int[][] sent_pairs;
     private int num_visited;
-    //private Semaphore visited_semaphore;
-    //private Semaphore weight_matrix_semaphore;
-    //private Semaphore[] socket_semaphores;
-    //private Semaphore sent_pair_semaphore;
-    //private Socket[] sockets;
-    //private boolean ready_to_die;
-    //private boolean die;
     private HashMap<Integer,Server> servers;
     private HashMap<Integer,Client> clients;
     private HashMap<Integer,Boolean> visited;
@@ -33,7 +22,6 @@ public class Node extends Thread
 
     public Node(int id, int[] neighbors_id, double[] edges, int[] neighbors_input_port, int[] neighbors_output_port, int num_of_nodes)
     {
-        this.first_time = true;
         this.id = id;
         this.neighbors_id = neighbors_id;
         this.edges = edges;
@@ -60,28 +48,6 @@ public class Node extends Thread
             clients.put(neighbors_id[i], new Client(this.neighbors_output_port[i], this));
         }
 
-        /*this.visited = new int[this.num_of_nodes];
-        for (int i = 0; i < this.num_of_nodes; i++)
-        {
-            this.visited[i] = 0;
-        }
-        this.visited[this.id - 1] = 1;*/
-
-
-        /*this.sent_pairs = new int[this.num_of_nodes][this.num_of_nodes];
-        for (int i = 0; i < this.num_of_nodes; i++)
-        {
-            for (int j = 0; j < this.num_of_nodes; j++)
-            {
-                this.sent_pairs[i][j] = 0;
-            }
-        }
-        for (int j = 0; j < this.num_of_nodes; j++)
-        {
-            this.sent_pairs[j][j] = 1;
-        }*/
-
-
         this.weight_matrix = new double[num_of_nodes][num_of_nodes];
         for (int i = 0; i < this.num_of_nodes; i++)
         {
@@ -97,43 +63,7 @@ public class Node extends Thread
         }
 
         this.linked_state = this.create_linked_state();
-
-        /*this.visited_semaphore = new Semaphore(1);
-
-        this.sent_pair_semaphore = new Semaphore(1);
-
-        this.weight_matrix_semaphore = new Semaphore(1);
-
-        this.socket_semaphores = new Semaphore[this.neighbors_output_port.length];
-        for (int i = 0; i < this.neighbors_output_port.length; i++)
-        {
-            this.socket_semaphores[i] = new Semaphore(1);
-        }
-
-        this.ready_to_die = false;
-        this.die = false;
-
-        try
-        {
-            InetAddress ip = InetAddress.getByName("localhost");
-            this.sockets = new Socket[this.neighbors_output_port.length];
-        }
-        catch (Exception e)
-        {
-            System.out.println("error caught in Node constructor creating sockets");
-            e.printStackTrace();
-        }*/
     }
-
-   /* public Pair createLinkedState()
-    {
-        Object[] arr = new Object[this.edges.length];
-        for (int i = 0; i < this.edges.length; i++)
-        {
-            arr[i] = new Pair<>(new Pair<>(this.id, this.neighbors_id[i]), this.edges[i]);
-        }
-        return new Pair<>(this.id, arr);
-    }*/
 
     public void update_edge(int id2, double weight)
     {
@@ -167,52 +97,7 @@ public class Node extends Thread
         System.out.println(this.id);
     }
 
-    /*@Override
-    public void run()
-    {
-        this.servers = new InputThread[num_of_neighbors];
-        for (int i = 0; i < num_of_neighbors; i++)
-        {
-            InputThread server = new InputThread(this.neighbors_input_port[i], this);
-            this.servers[i] = server;
-            server.start();
-        }
 
-        OutputThread[] clients = new OutputThread[num_of_neighbors];
-        for (int i = 0; i < num_of_neighbors; i++)
-        {
-            OutputThread client = new OutputThread(i, this.linkedState, this, null);
-            clients[i] = client;
-            client.start();
-        }
-
-        // wait for all threads to die
-
-        for (int i = 0; i < num_of_neighbors; i++)
-        {
-            try
-            {
-                clients[i].join();
-            }
-            catch (Exception e)
-            {
-                System.out.println("error caught in Node join");
-                e.printStackTrace();
-            }
-        }
-        for (int i = 0; i < num_of_neighbors; i++)
-        {
-            try
-            {
-                servers[i].join();
-            }
-            catch (Exception e)
-            {
-                System.out.println("error caught in Node join");
-                e.printStackTrace();
-            }
-        }
-    }*/
     @Override
     public void run()
     {
@@ -266,11 +151,19 @@ public class Node extends Thread
                     {
                         continue;
                     }
+
+                    int source_id = message.getId();
+                    if (visited.get(source_id))
+                    {
+                        continue;
+                    }
+
                     for (int id2: this.neighbors_id)
                     {
                         clients.get(id2).send_message(message);
                     }
-                    this.process_message(message);
+
+                    this.process_message(message, id1);
                 }
                 catch (Exception e)
                 {
@@ -278,10 +171,10 @@ public class Node extends Thread
                 }
             }
         }
-        this.terminate();
+        //this.terminate();
     }
 
-    public void process_message(Message message)
+    public void process_message(Message message, int port)
     {
         try {
             int source_id = message.getId();
@@ -323,11 +216,8 @@ public class Node extends Thread
     {
         for (int id: this.neighbors_id)
         {
-            clients.get(id).terminate();
-        }
-        for (int id: this.neighbors_id)
-        {
             servers.get(id).terminate();
+            clients.get(id).terminate();
         }
     }
 
