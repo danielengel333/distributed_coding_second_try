@@ -3,8 +3,8 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class main {
-    public static void main(String[] args) throws FileNotFoundException {
-        String[] paths = {"input_5.txt"}; //enter the path to the files you want to run here.
+    public static void main(String[] args) throws FileNotFoundException { //"input_1.txt","input_2.txt","input_3.txt","input_4.txt"
+        String[] paths = {"input_1.txt","input_2.txt","input_3.txt","input_4.txt"}; //enter the path to the files you want to run here.
         for(String path: paths) {
             ExManager m = new ExManager(path);
             m.read_txt();
@@ -24,7 +24,6 @@ public class main {
                 if(line.contains("update")){
                     String[] data = line.split(" ");
                     m.update_edge(Integer.parseInt(data[1]), Integer.parseInt(data[2]), Double.parseDouble(data[3]));
-                    System.out.println("update");
                 }
             }
             m.terminate();

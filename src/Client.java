@@ -23,7 +23,7 @@ public class Client extends Thread
         }
         catch (Exception e)
         {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -42,7 +42,7 @@ public class Client extends Thread
         }
         catch (Exception e)
         {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
